@@ -1,0 +1,31 @@
+[project]
+name = "apeFEA"
+version = "0.1.0"
+description = "A modular nonlinear FEM framework for structural analysis"
+authors = [
+    {name = "Nicolás Mora Bowen", email = "nmorabowen@example.com"}
+]
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent"
+]
+
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "plotly"
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "black", "isort", "mypy"]
+
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["apeFEA"]

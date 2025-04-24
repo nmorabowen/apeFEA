@@ -1,0 +1,8 @@
+README.md
+pyproject.toml
+apeFEA/__init__.py
+apeFEA.egg-info/PKG-INFO
+apeFEA.egg-info/SOURCES.txt
+apeFEA.egg-info/dependency_links.txt
+apeFEA.egg-info/requires.txt
+apeFEA.egg-info/top_level.txt

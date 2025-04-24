@@ -1,0 +1,29 @@
+Metadata-Version: 2.4
+Name: apeFEA
+Version: 0.1.0
+Summary: A modular nonlinear FEM framework for structural analysis
+Author-email: Nicolás Mora Bowen <nmorabowen@example.com>
+License-Expression: MIT
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: numpy
+Requires-Dist: scipy
+Requires-Dist: matplotlib
+Requires-Dist: plotly
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: isort; extra == "dev"
+Requires-Dist: mypy; extra == "dev"
+
+# apeFEA
+
+A modular nonlinear finite element framework for structural analysis, focused on Pythonic clarity, extendability, and research-oriented workflows.
+
+## Features
+- Material and geometric nonlinearity
+- Modular geometry definition
+- Configurable DOF and dimensions
+- Node management and plotting
