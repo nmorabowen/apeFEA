@@ -7,7 +7,6 @@ __version__ = "0.1.0"
 from .core.node import Node
 from .core.config import FEMConfig
 
-
 # Import geometry components
 from .geometry import Geometry
 
@@ -15,3 +14,11 @@ from .geometry import Geometry
 from .domain.domain import Domain
 from .domain.node_domain import NodeDomain
 
+# Import materials
+from .materials import Material, UniaxialElasticMaterial
+
+# Import sections
+from .section import RectangularSection
+
+# Import elements
+from .elements import Element, Beam2D
