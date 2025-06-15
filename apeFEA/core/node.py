@@ -78,6 +78,10 @@ class Node:
         self.id = id
         self.idx = self.set_indices(start_index=self.id)
     
+    def set_coords(self, coords: List[float]) -> None:
+        """Set the coordinates of this node."""
+        self.coords = np.array(coords, dtype=float)
+    
     # ---------------------------------------------------
     # Boundary Conditions
     def set_restrain_displacements(self, displacements: List[float]) -> None:
