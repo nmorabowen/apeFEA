@@ -74,7 +74,7 @@ class Node:
 
     # ---------------------------------------------------
     def set_node_id(self, id: int) -> None:
-        """Set the unique identifier for this node."""
+        """Set the unique identifier for this node. 1"""
         self.id = id
         self.idx = self.set_indices(start_index=self.id)
     
