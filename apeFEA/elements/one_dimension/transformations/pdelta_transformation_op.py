@@ -60,11 +60,11 @@ class PDeltaTransformation2D_OP(Transformation):
         for OpenSees-style linear PDelta transformation (constant matrix).
         """
         L = self.get_length()  # or self.L0 for fixed geometry
-
+        delta_ul_y= self.ul14  # ul1 - ul4 for leaning-column effect
         Tbl = np.array([
-            [-1,  0,  0,   1,   0,  0],     # axial deformation (u_jx - u_ix)
-            [ 0,  1,  1,   0,  -1,  0],     # curvature at node i
-            [ 0,  1,  0,   0,  -1,  1],     # curvature at node j
+            [-1,  -delta_ul_y/L,  0,   1,   delta_ul_y/L,  0],     # axial deformation (u_jx - u_ix)
+            [ 0,  1/L,  1,   0,  -1/L,  0],     # curvature at node i
+            [ 0,  1/L,  0,   0,  -1/L,  1],     # curvature at node j
         ])
         
         return Tbl
