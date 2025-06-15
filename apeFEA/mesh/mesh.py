@@ -1,12 +1,5 @@
 """
-MeshBuilder Module
-------------------
-This module defines the MeshBuilder class, which generates a 1D mesh of FrameElements between two given nodes. 
-It preserves original nodes and their properties (e.g., boundary conditions or loads) and automatically adds 
-intermediate nodes based on a specified mesh size.
-
-Author: Patricio Palacios B., M.Sc y Caiza.
-Version: 1.0
+MeshBuilder class for generating 1D meshes between two nodes using maximum mesh size.
 """
 
 from math import sqrt, ceil
@@ -23,52 +16,56 @@ class MeshBuilder:
     def __init__(self):
         self.nodes: list[Node] = []
         self.elements: list[FrameElement] = []
-        self._node_id_counter: int = 1
-        self._element_id_counter: int = 1
 
-    def mesh_line(self, start: Node, end: Node, mesh_size: float, section: Section, transformation) -> None:
-        """Create a mesh of elements between two coordinates with a given section and transformation."""
-        x1, y1 = start.coords
-        x2, y2 = end.coords
-        total_length = sqrt((x2 - x1)**2 + (y2 - y1)**2)
-        n_div = max(1, ceil(total_length / mesh_size))
-        dx = (x2 - x1) / n_div
-        dy = (y2 - y1) / n_div
+    def mesh_line(self, ni: Node, nj: Node, mesh_size: float, section: Section, transformation: Optional[Transformation] = None):
+        xi, yi = ni.coords
+        xj, yj = nj.coords
 
-        # Reuse or add the first node
-        prev = self._get_or_add_node(start.coords)
+        length = sqrt((xj - xi)**2 + (yj - yi)**2)
+        n_div = ceil(length / mesh_size)
+
+        dx = (xj - xi) / n_div
+        dy = (yj - yi) / n_div
+
+        if not any(n.id == ni.id for n in self.nodes):
+            self.nodes.append(ni)
+        if not any(n.id == nj.id for n in self.nodes):
+            self.nodes.append(nj)
+
+        used_ids = {n.id for n in self.nodes}
+        current_id = max(used_ids) + 1
+
+        node_list = [ni]
 
         for i in range(1, n_div):
-            x = x1 + i * dx
-            y = y1 + i * dy
-            next_node = self._get_or_add_node([x, y])
-            self._add_element(prev, next_node, section, transformation)
-            prev = next_node
+            x = xi + i * dx
+            y = yi + i * dy
 
-        # Reuse or add the last node
-        final = self._get_or_add_node(end.coords)
-        self._add_element(prev, final, section, transformation)
+            if any(np.allclose(n.coords, [x, y]) for n in self.nodes):
+                continue
 
-    def _get_or_add_node(self, coords: list[float], tol: float = 1e-6) -> Node:
-        for node in self.nodes:
-            if np.linalg.norm(np.array(node.coords) - np.array(coords)) < tol:
-                return node
-        new_node = Node(id=self._node_id_counter, coords=coords)
-        new_node.set_node_id(self._node_id_counter)
-        self.nodes.append(new_node)
-        self._node_id_counter += 1
-        return new_node
+            while current_id in used_ids:
+                current_id += 1
 
-    def _add_element(self, ni: Node, nj: Node, section: Section, transformation):
-        if ni is nj:
-            print(f"[⚠️] Skipping zero-length element between Node {ni.id} and itself.")
-            return
-        element = FrameElement(
-            id=self._element_id_counter,
-            nodes=[ni, nj],
-            section=section,
-            transformation=transformation,
-        )
-        self.elements.append(element)
-        self._element_id_counter += 1
+            new_node = Node(current_id, [x, y])
+            self.nodes.append(new_node)
+            node_list.append(new_node)
+            used_ids.add(current_id)
+            current_id += 1
 
+        node_list.append(nj)
+
+        # Generate FrameElements between consecutive nodes
+        next_element_id = max((e.id for e in self.elements), default=0) + 1
+
+        for i in range(len(node_list) - 1):
+            n_start = node_list[i]
+            n_end = node_list[i + 1]
+            element = FrameElement(
+                id=next_element_id,
+                nodes=[n_start, n_end],
+                section=section,
+                transformation=transformation
+            )
+            self.elements.append(element)
+            next_element_id += 1
