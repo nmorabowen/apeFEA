@@ -5,7 +5,7 @@ This module defines the MeshBuilder class, which generates a 1D mesh of FrameEle
 It preserves original nodes and their properties (e.g., boundary conditions or loads) and automatically adds 
 intermediate nodes based on a specified mesh size.
 
-Author: Patricio Palacios B., M.Sc.
+Author: Patricio Palacios B., M.Sc y Caiza.
 Version: 1.0
 """
 
