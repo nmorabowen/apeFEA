@@ -1,8 +1,9 @@
 import numpy as np
 from numpy import ndarray
-from typing import List
+from typing import List, TYPE_CHECKING
 
-from apeFEA.core.node import Node  # or use Protocol from TYPE if needed
+if TYPE_CHECKING:
+    from apeFEA.core.node import Node  # or use Protocol from TYPE if needed
 
 
 class NodalLoad:
@@ -24,7 +25,7 @@ class NodalLoad:
         Array of force values for each degree of freedom.
     """
 
-    def __init__(self, node: Node, load_pattern: List[float]):
+    def __init__(self, node: "Node", load_pattern: List[float]):
         self.node: Node = node
         self.load_pattern: ndarray = np.array(load_pattern, dtype=float)
 

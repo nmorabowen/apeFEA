@@ -1,7 +1,8 @@
 import numpy as np
-from typing import List, Optional
+from typing import List, Optional, TYPE_CHECKING
 
-from .node import Node
+if TYPE_CHECKING:
+    from .node import Node
 
 
 class Restraints:
@@ -31,7 +32,7 @@ class Restraints:
 
     def __init__(
         self,
-        node: Node,
+        node: "Node",
         restrain_list: Optional[List[str]] = None,
         restrain_displacement: Optional[List[float]] = None
     ):

@@ -1,3 +1,3 @@
-from .newton_raphson import NewtonRaphson
+from .newton_raphson import NewtonRaphsonSolver
 
-__all__ = ["NewtonRaphson"]
+__all__ = ["NewtonRaphsonSolver"]

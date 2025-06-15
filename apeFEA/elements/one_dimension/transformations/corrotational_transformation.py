@@ -1,9 +1,12 @@
 import numpy as np
 from numpy import ndarray
+from typing import TYPE_CHECKING
 
 from .transformation import Transformation
 from apeFEA.core.node import Node
-from apeFEA.elements.one_dimension.frame_element import FrameElement
+
+if TYPE_CHECKING:
+    from apeFEA.elements.one_dimension.frame_element import FrameElement
 
 class CorotationalTransformation2D(Transformation):
     """
@@ -29,7 +32,7 @@ class CorotationalTransformation2D(Transformation):
     ub_previous : ndarray
         Basic deformation from previous iteration (for ΔΔu).
     """
-    def __init__(self, element: FrameElement):
+    def __init__(self, element: "FrameElement"):
         self.element = element
         self.node_i = element.node_i
         self.node_j = element.node_j

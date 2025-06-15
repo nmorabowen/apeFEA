@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: apeFEA
+Version: 0.1.0
+Summary: Nonlinear FEM framework - LARGA VIDA AL LADRUÑO!!!
+Author-email: Nicolás Mora Bowen <nmorabowen@gmail.com>, Patricio Palacios <pxpalacios@gmail.com>
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: matplotlib
+Dynamic: license-file

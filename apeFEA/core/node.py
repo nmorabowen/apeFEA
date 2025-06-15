@@ -1,9 +1,9 @@
 import numpy as np
 from numpy import ndarray
-from typing import List, Optional
+from typing import List, Optional, TYPE_CHECKING
 
-from apeFEA.core.restraints import Restraints
-from apeFEA.core.nodal_load import NodalLoad
+from .restraints import Restraints
+from .nodal_load import NodalLoad
 
 
 class Node:

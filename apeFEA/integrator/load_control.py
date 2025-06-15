@@ -59,4 +59,4 @@ class LoadControl:
         plt.tight_layout()
         plt.show()
         
-    return fig, ax
+        return fig, ax

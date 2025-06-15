@@ -40,7 +40,7 @@ from .solver.newton_raphson import NewtonRaphsonSolver
 from .integrator.load_control import LoadControl
 
 # Meshing utilities
-from .mesh.mesh import mesh_line
+from .mesh.mesh import MeshBuilder
 
 __all__ = [
     "Node",
@@ -59,5 +59,5 @@ __all__ = [
     "Model",
     "NewtonRaphsonSolver",
     "LoadControl",
-    "mesh_line"
+    "MeshBuilder"
 ]

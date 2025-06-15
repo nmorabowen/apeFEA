@@ -1,14 +1,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from typing import Tuple, List
+from typing import Tuple, List, TYPE_CHECKING
 
-from apeFEA.core.model import Model
+if TYPE_CHECKING:
+    from apeFEA.core.model import Model
 
 
 class NewtonRaphsonSolver:
     def __init__(
         self,
-        model: Model,
+        model: "Model",
         tolerance: float = 1e-6,
         max_iterations: int = 20,
         verbose: bool = False,
