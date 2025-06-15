@@ -33,15 +33,13 @@ class MeshBuilder:
         dx = (xj - xi) / n_div
         dy = (yj - yi) / n_div
 
-        node_list = [ni]
-
         if not any(n.id == ni.id for n in self.nodes):
             self.nodes.append(ni)
         if not any(n.id == nj.id for n in self.nodes):
             self.nodes.append(nj)
 
         node_list = [ni]
-        next_node_id = max((n.id for n in self.nodes), default=0) + 2
+        next_node_id = max((n.id for n in self.nodes), default=0) + 1
 
         for i in range(1, n_div):
             x = xi + i * dx
@@ -63,6 +61,26 @@ class MeshBuilder:
 
         if any(n1.id == n2.id and np.allclose(n1.coords, n2.coords) for i, n1 in enumerate(self.nodes) for n2 in self.nodes[i+1:]):
             print("⚠️ Duplicate nodes detected.")
+
+    def renumber_nodes(self, start_id=1):
+        """
+        Renumber all nodes with new sequential IDs starting from `start_id`.
+        Updates references in all FrameElements accordingly.
+        """
+        id_map = {}
+        for new_id, node in enumerate(self.nodes, start=start_id):
+            id_map[node.id] = new_id
+            node.id = new_id
+
+        for ele in self.elements:
+            ele.nodes = [next(n for n in self.nodes if n.id == id_map[old.id]) for old in ele.nodes]
+
+    def assign_dof_indices(self, ndof: int):
+        """
+        Assign sequential degrees of freedom (DoF) indices to each node.
+        """
+        for i, node in enumerate(self.nodes):
+            node.idx = np.array([i * ndof + j for j in range(ndof)])
 
     def get_nodes(self):
         return self.nodes
