@@ -55,12 +55,13 @@ class PDeltaTransformation2D_OP(Transformation):
         ])
 
     def get_Tbl(self) -> ndarray:
-        L = self.L0
-        return np.array([
-            [-1,  0,  0,  1,  0, 0],
-            [ 0,  1,  1,  0,  0, 0],
-            [ 0,  1,  0,  0,  0, 1]
-        ]) / L
+        L = self.get_length()
+        Tbl = np.array([
+            [-1,  0, 0,  1,  0, 0],
+            [ 0, 1/L, 1,  0, -1/L, 0],
+            [ 0, 1/L, 0,  0, -1/L, 1],
+        ])
+        return Tbl
 
     def update_trial(self) -> None:
         """Update the basic deformation ub_trial and ul14 for P–Δ effect."""
