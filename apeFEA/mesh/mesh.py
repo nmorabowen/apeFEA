@@ -41,6 +41,9 @@ class MeshBuilder:
             next_node_id += 1
 
         node_list.append(nj)
+        
+        for i, node in enumerate(node_list):
+            node.set_node_id(i+1)
 
         next_ele_id = max((e.id for e in self.elements), default=0) + 1
         for i in range(n_div):

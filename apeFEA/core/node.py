@@ -73,6 +73,12 @@ class Node:
         self.loads: List[NodalLoad] = []
 
     # ---------------------------------------------------
+    def set_node_id(self, id: int) -> None:
+        """Set the unique identifier for this node."""
+        self.id = id
+        self.idx = self.set_indices(start_index=self.id)
+    
+    # ---------------------------------------------------
     # Boundary Conditions
     def set_restrain_displacements(self, displacements: List[float]) -> None:
         """Apply single-point displacement restraints (SP displacements)."""
