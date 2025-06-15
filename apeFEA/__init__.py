@@ -26,6 +26,7 @@ from .sections.section import Section
 from .elements.one_dimension.transformations.linear_transformation import LinearTransformation
 from .elements.one_dimension.transformations.corrotational_transformation import CorotationalTransformation2D
 from .elements.one_dimension.transformations.pdelta_transformation import PDeltaTransformation2D
+from .elements.one_dimension.transformations.pdelta_transformation_op import PDeltaTransformation2D_OP
 
 # Frame elements import
 from .elements.one_dimension.frame_element import FrameElement
@@ -55,6 +56,7 @@ __all__ = [
     "LinearTransformation",
     "CorotationalTransformation2D",
     "PDeltaTransformation2D",
+    "PDeltaTransformation2D_OP",
     "FrameElement",
     "Model",
     "NewtonRaphsonSolver",
