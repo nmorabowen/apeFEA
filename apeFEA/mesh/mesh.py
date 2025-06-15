@@ -9,8 +9,9 @@ Author: Patricio Palacios B., M.Sc y Caiza.
 Version: 1.0
 """
 
-import numpy as np
 from math import sqrt, ceil
+import numpy as np
+from typing import Optional
 
 from apeFEA.core.node import Node
 from apeFEA.elements.one_dimension.frame_element import FrameElement
@@ -22,68 +23,52 @@ class MeshBuilder:
     def __init__(self):
         self.nodes: list[Node] = []
         self.elements: list[FrameElement] = []
+        self._node_id_counter: int = 1
+        self._element_id_counter: int = 1
 
-    def mesh_line(self, ni: Node, nj: Node, mesh_size: float, section: Section, transformation: Transformation = None):
-        xi, yi = ni.coords
-        xj, yj = nj.coords
+    def mesh_line(self, start: Node, end: Node, mesh_size: float, section: Section, transformation) -> None:
+        """Create a mesh of elements between two coordinates with a given section and transformation."""
+        x1, y1 = start.coords
+        x2, y2 = end.coords
+        total_length = sqrt((x2 - x1)**2 + (y2 - y1)**2)
+        n_div = max(1, ceil(total_length / mesh_size))
+        dx = (x2 - x1) / n_div
+        dy = (y2 - y1) / n_div
 
-        total_length = sqrt((xj - xi) ** 2 + (yj - yi) ** 2)
-        n_div = ceil(total_length / mesh_size)
-
-        dx = (xj - xi) / n_div
-        dy = (yj - yi) / n_div
-
-        if not any(n.id == ni.id for n in self.nodes):
-            self.nodes.append(ni)
-        if not any(n.id == nj.id for n in self.nodes):
-            self.nodes.append(nj)
-
-        node_list = [ni]
-        next_node_id = max((n.id for n in self.nodes), default=0) + 1
+        # Reuse or add the first node
+        prev = self._get_or_add_node(start.coords)
 
         for i in range(1, n_div):
-            x = xi + i * dx
-            y = yi + i * dy
-            node = Node(next_node_id, [x, y])
-            self.nodes.append(node)
-            node_list.append(node)
-            next_node_id += 1
+            x = x1 + i * dx
+            y = y1 + i * dy
+            next_node = self._get_or_add_node([x, y])
+            self._add_element(prev, next_node, section, transformation)
+            prev = next_node
 
-        node_list.append(nj)
+        # Reuse or add the last node
+        final = self._get_or_add_node(end.coords)
+        self._add_element(prev, final, section, transformation)
 
-        next_ele_id = max((e.id for e in self.elements), default=0) + 1
-        for i in range(n_div):
-            n_start = node_list[i]
-            n_end = node_list[i + 1]
-            ele = FrameElement(id=next_ele_id, nodes=[n_start, n_end], section=section, transformation=transformation)
-            self.elements.append(ele)
-            next_ele_id += 1
+    def _get_or_add_node(self, coords: list[float], tol: float = 1e-6) -> Node:
+        for node in self.nodes:
+            if np.linalg.norm(np.array(node.coords) - np.array(coords)) < tol:
+                return node
+        new_node = Node(id=self._node_id_counter, coords=coords)
+        new_node.set_node_id(self._node_id_counter)
+        self.nodes.append(new_node)
+        self._node_id_counter += 1
+        return new_node
 
-        if any(n1.id == n2.id and np.allclose(n1.coords, n2.coords) for i, n1 in enumerate(self.nodes) for n2 in self.nodes[i+1:]):
-            print("⚠️ Duplicate nodes detected.")
+    def _add_element(self, ni: Node, nj: Node, section: Section, transformation):
+        if ni is nj:
+            print(f"[⚠️] Skipping zero-length element between Node {ni.id} and itself.")
+            return
+        element = FrameElement(
+            id=self._element_id_counter,
+            nodes=[ni, nj],
+            section=section,
+            transformation=transformation,
+        )
+        self.elements.append(element)
+        self._element_id_counter += 1
 
-    def renumber_nodes(self, start_id=1):
-        """
-        Renumber all nodes with new sequential IDs starting from `start_id`.
-        Updates references in all FrameElements accordingly.
-        """
-        id_map = {}
-        for new_id, node in enumerate(self.nodes, start=start_id):
-            id_map[node.id] = new_id
-            node.id = new_id
-
-        for ele in self.elements:
-            ele.nodes = [next(n for n in self.nodes if n.id == id_map[old.id]) for old in ele.nodes]
-
-    def assign_dof_indices(self, ndof: int):
-        """
-        Assign sequential degrees of freedom (DoF) indices to each node.
-        """
-        for i, node in enumerate(self.nodes):
-            node.idx = np.array([i * ndof + j for j in range(ndof)])
-
-    def get_nodes(self):
-        return self.nodes
-
-    def get_elements(self):
-        return self.elements
