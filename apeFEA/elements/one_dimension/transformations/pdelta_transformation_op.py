@@ -107,25 +107,23 @@ class PDeltaTransformation2D_OP(Transformation):
         """Return Δy = ul1 - ul4 for leaning-column moment effect."""
         return self.ul14
 
-    def geometric_transformation_matrix(self, P: float) -> ndarray:
+    def geometric_transformation_matrix(self) -> tuple[ndarray, ndarray]:
         """
-        Compute the geometric stiffness matrix (global) due to axial force P.
-        Matches OpenSees-style PDelta contribution.
+        Return geometric stiffness transformation pattern matrices (6×6 each).
+        These are used in the element as:
+            K_geo = Fb[0] * T_geo_Fb1 + (Fb[1] + Fb[2]) * T_geo_Fb2
         """
-        L = self.L0
-        c, s = self.cos_theta, self.sin_theta
+        L = self.get_L0()
 
-        # Local geometric stiffness matrix (6×6)
-        kG_local = (P / L) * np.array([
-            [ 0,  0,  0,  0,  0, 0],
-            [ 0,  1,  0,  0, -1, 0],
-            [ 0,  0,  0,  0,  0, 0],
-            [ 0,  0,  0,  0,  0, 0],
-            [ 0, -1,  0,  0,  1, 0],
-            [ 0,  0,  0,  0,  0, 0]
+        T_geo_Fb1 = (1 / L) * np.array([
+            [0, 0, 0, 0, 0, 0],
+            [0, 1, 0, 0, -1, 0],
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0],
+            [0, -1, 0, 0, 1, 0],
+            [0, 0, 0, 0, 0, 0]
         ])
 
-        # Rotate to global system
-        T = self.get_Tlg()
-        kg = T.T @ kG_local @ T
-        return kg
+        T_geo_Fb2 = np.zeros((6, 6))  # not used in OpenSees PDelta
+
+        return T_geo_Fb1, T_geo_Fb2
