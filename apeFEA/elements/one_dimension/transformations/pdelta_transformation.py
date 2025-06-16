@@ -122,14 +122,24 @@ class PDeltaTransformation2D(Transformation):
         ])
 
     def update_trial(self):
+        
+        # self.ub_previous[:] = self.ub_trial
+        # Tbl = self.get_Tbl()
+        # u_trial_global = np.vstack((self.node_i.u_trial, self.node_j.u_trial))
+        # u_trial_local = self.get_Tlg() @ u_trial_global
+        # self.ub_trial[:] = Tbl @ u_trial_local  # basic system update
+        
         """Update the basic deformation ub_trial."""
         L0 = self.get_L0()
+        L = self.get_length()
         _, Delta_ul_x, Delta_ul_y = self._get_corrotational_parameters()
 
         self.ub_previous[:] = self.ub_trial
-        self.ub_trial[0, 0] = L0*(Delta_ul_x/L0+(1/2)*(Delta_ul_y/L0)**2)
+        # self.ub_trial[0, 0] = L0*(Delta_ul_x/L0+(1/2)*(Delta_ul_y/L0)**2)
+        self.ub_trial[0, 0] = Delta_ul_x
         self.ub_trial[1, 0] = self.node_i.u_trial[2, 0] - Delta_ul_y/L0
         self.ub_trial[2, 0] = self.node_j.u_trial[2, 0] - Delta_ul_y/L0
+
 
     def commit_state(self):
         self.ub_commit[:] = self.ub_trial
@@ -164,6 +174,7 @@ class PDeltaTransformation2D(Transformation):
             [0, -1, 0, 0, 1, 0],
             [0, 0, 0, 0, 0, 0]
         ])
+        
         
         T_geo_Fb2 = np.zeros((6, 6))
         
