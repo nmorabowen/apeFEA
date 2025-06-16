@@ -73,15 +73,41 @@ class PDeltaTransformation2D(Transformation):
 
     def get_Tbl(self) -> ndarray:
         L0 = self.get_L0()
-        beta, _, Delta_ul_y = self._get_corrotational_parameters()
+        L = self.get_length()
+        _, _, Delta_ul_y = self._get_corrotational_parameters()
         
         Tbl= np.array(
             [
                 [-1, -Delta_ul_y/L0, 0, 1, Delta_ul_y/L0, 0],
-                [-Delta_ul_y/L0**2, 1/L0, 1, Delta_ul_y/L0**2, -1/L0, 0],
-                [-Delta_ul_y/L0**2, 1/L0, 0, Delta_ul_y/L0**2, -1/L0, 1]
+                [0, 1/L0, 1, 0, -1/L0, 0],
+                [0, 1/L0, 0, 0, -1/L0, 1]
             ]
         )
+        
+        # Tbl = np.array(
+        #     [
+        #         [-1, -Delta_ul_y/L, 0, 1, Delta_ul_y/L, 0],
+        #         [-Delta_ul_y/L**2, 1/L, 1, Delta_ul_y/L**2, -1/L, 0],
+        #         [-Delta_ul_y/L**2, 1/L, 0, Delta_ul_y/L**2, -1/L, 1]
+        #     ]
+        # )
+        
+        # Tbl = np.array(
+        #     [
+        #         [-1, -Delta_ul_y/L0, 0, 1, Delta_ul_y/L0, 0],
+        #         [-Delta_ul_y/L0**2, 1/L0, 1, Delta_ul_y/L0**2, -1/L0, 0],
+        #         [-Delta_ul_y/L0**2, 1/L0, 0, Delta_ul_y/L0**2, -1/L0, 1]
+        #     ]
+        # )
+        
+        # Tbl = np.array(
+        #     [
+        #         [-1, -Delta_ul_y/L, 0, 1, Delta_ul_y/L, 0],
+        #         [0, 1/L, 1, 0, -1/L, 0],
+        #         [0, 1/L, 0, 0, -1/L, 1]
+        #     ]
+        # )
+        
         return Tbl
 
     def get_Tlg(self) -> ndarray:
@@ -98,16 +124,12 @@ class PDeltaTransformation2D(Transformation):
     def update_trial(self):
         """Update the basic deformation ub_trial."""
         L0 = self.get_L0()
-        Ln = self.get_length()
-        beta, _, _ = self._get_corrotational_parameters()
-
-        theta_i = self.node_i.u_trial[2, 0]
-        theta_j = self.node_j.u_trial[2, 0]
+        _, Delta_ul_x, Delta_ul_y = self._get_corrotational_parameters()
 
         self.ub_previous[:] = self.ub_trial
-        self.ub_trial[0, 0] = Ln - L0
-        self.ub_trial[1, 0] = theta_i - beta
-        self.ub_trial[2, 0] = theta_j - beta
+        self.ub_trial[0, 0] = L0*(Delta_ul_x/L0+(1/2)*(Delta_ul_y/L0)**2)
+        self.ub_trial[1, 0] = self.node_i.u_trial[2, 0] - Delta_ul_y/L0
+        self.ub_trial[2, 0] = self.node_j.u_trial[2, 0] - Delta_ul_y/L0
 
     def commit_state(self):
         self.ub_commit[:] = self.ub_trial
@@ -132,16 +154,14 @@ class PDeltaTransformation2D(Transformation):
 
     def geometric_transformation_matrix(self) -> tuple[ndarray, ndarray]:
         L = self.get_length()
-        beta, _, _ = self._get_corrotational_parameters()
-        c = np.cos(beta)
-        s = np.sin(beta)
+        L0 = self.get_L0()
 
-        T_geo_Fb1 = (1/L) * np.array([
+        T_geo_Fb1 = (1 / L0) * np.array([
             [0, 0, 0, 0, 0, 0],
-            [0, 1, 0, 0,-1, 0],
+            [0, 1, 0, 0, -1, 0],
             [0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0],
-            [0,-1, 0, 0, 1, 0],
+            [0, -1, 0, 0, 1, 0],
             [0, 0, 0, 0, 0, 0]
         ])
         

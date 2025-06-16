@@ -20,6 +20,7 @@ apeFEA/elements/one_dimension/transformations/__init__.py
 apeFEA/elements/one_dimension/transformations/corrotational_transformation.py
 apeFEA/elements/one_dimension/transformations/linear_transformation.py
 apeFEA/elements/one_dimension/transformations/pdelta_transformation.py
+apeFEA/elements/one_dimension/transformations/pdelta_transformation_op.py
 apeFEA/elements/one_dimension/transformations/transformation.py
 apeFEA/integrator/__init__.py
 apeFEA/integrator/load_control.py

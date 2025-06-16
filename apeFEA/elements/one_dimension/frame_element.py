@@ -69,6 +69,7 @@ class FrameElement(Element):
     def get_basic_stiffness_matrix(self) -> ndarray:
         EA, EI = self.section.get_stiffness_matrix()
         L = self.transformation.get_length()
+        # L = self.transformation.get_L0()
 
         kb=np.array([
             [EA/L, 0, 0],
@@ -82,7 +83,6 @@ class FrameElement(Element):
         
         # Get the transformation matrices
         Tbl = self.transformation.get_Tbl()
-        Tlg = self.transformation.get_Tlg()
         
         # Get the material stiffness matrix
         kb_material = self.get_basic_stiffness_matrix()
@@ -93,7 +93,9 @@ class FrameElement(Element):
         Fb = results['Fb']
         T_geo_Fb1, T_geo_Fb2 = self.transformation.geometric_transformation_matrix()
         
-        kl_geometric = Fb[0] * T_geo_Fb1  + (Fb[1]+Fb[2]) * T_geo_Fb2
+        # print(f'From element: {self.id} - Fb: {Fb[1,0]+Fb[2,0]}')
+        
+        kl_geometric = Fb[0,0] * T_geo_Fb1  + (Fb[1,0]+Fb[2,0]) * T_geo_Fb2
         
         # Tangent stiffness matrix
         kl= kl_material + kl_geometric
