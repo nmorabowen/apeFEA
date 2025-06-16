@@ -26,7 +26,7 @@ class LoadControl:
     def run(self) -> None:
         """Execute the static analysis across load steps."""
         for i, t in enumerate(self.time_values):
-            print(f"\n=== Load Step {i}/{self.steps} – Pseudo-time: {t:.3f} ===")
+            print(f"\n=== Load Step {i}/{self.steps} – Pseudo-time: {t:.3f} === ")
             try:
                 u, residuals, n_iter = self.solver.solve(t)
                 self.u_history.append(u.copy())

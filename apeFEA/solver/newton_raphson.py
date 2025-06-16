@@ -68,7 +68,7 @@ class NewtonRaphsonSolver:
                 raise RuntimeError(f"Linear solve failed: {e}")
 
             u += du
-            self.model.update_trial_state(u, verbose=self.verbose)
+            self.model.update_trial_state(u, verbose=self.verbose, print_elements=self.verbose)
 
             if self.verbose:
                 print(f"Δu.T =\n{du.T}")

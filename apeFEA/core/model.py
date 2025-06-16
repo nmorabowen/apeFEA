@@ -147,22 +147,67 @@ class Model:
         else:
             raise ValueError(f"Unsupported norm type: {norm_type}")
         
-    def update_trial_state(self, u: ndarray, verbose:bool = False) -> None:
-        """Update the trial state with a global assembly displacement vector.
-        This goes node by node mapping the trial displacements
-
-        Args:
-            u (ndarray): _description_
+    def update_trial_state(
+        self,
+        u: ndarray,
+        *,
+        verbose: bool = False,
+        print_elements: bool = False,
+        precision: int = 6,
+    ) -> None:
         """
+        Map a global displacement vector `u` into every node's `u_trial`
+        and refresh each element's transformation state.
+
+        Parameters
+        ----------
+        u : (ndof_total, 1) ndarray
+            Global displacement vector (usually 'u' from Newton iteration).
+        verbose : bool, optional
+            If True, print before/after trial displacements for every node.
+        print_elements : bool, optional
+            If True, also print each element's basic deformation `ub_trial`
+            and corotational angle β after the update.
+        precision : int, optional
+            NumPy print precision for nicer output.
+        """
+        np.set_printoptions(suppress=True, precision=precision, linewidth=160)
+
+        # --- NODE LOOP -------------------------------------------------------
+        if verbose:
+            print("\n─── Updating node trial displacements ─────────────────────────────")
+
         for node in self.nodes:
-            node.u_trial[:, 0] = u[node.idx, 0]
+            u_old = node.u_trial.copy()          # (3,1)
+            u_new = u[node.idx, 0].reshape(3, 1)
+
+            node.u_trial[:] = u_new
 
             if verbose:
-                print('--------------------------------------')
-                print(node)
-                print(f'Previous Trial Displacement: {node.u_trial.flatten()}')
-                print(f'set Trial Displacement: {node.u_trial.flatten()}')
-                print('---------------------------------------')
+                du = (u_new - u_old).flatten()
+                print(
+                    f"Node {node.id:>3}:  "
+                    f"u_old = {u_old.flatten()},  "
+                    f"u_new = {u_new.flatten()},  "
+                    f"Δu = {du}"
+                )
+
+        # --- ELEMENT LOOP ----------------------------------------------------
+        if verbose and print_elements:
+            print("\n─── Updating element transformations ─────────────────────────────")
+
+        for ele in self.elements:
+            ele.transformation.update_trial()
+
+            if verbose and print_elements:
+                ub = ele.transformation.get_basic_trial_disp().flatten()
+                beta, *_ = ele.transformation._get_corrotational_parameters()
+                print(
+                    f"Element {ele.id:>3}:  "
+                    f"ub_trial = {ub},  "
+                    f"β = {np.degrees(beta):.4f}°"
+                )
+
     
     def commit_state(self):
         for node in self.nodes:
@@ -186,6 +231,7 @@ class Model:
         """
         Assemble the global tangent stiffness matrix K for the model at the trial state.
         """
+        
         
         K = np.zeros((self.number_of_nodes * self.ndof, self.number_of_nodes * self.ndof))
         

@@ -81,6 +81,8 @@ class FrameElement(Element):
     
     def get_local_stiffness_matrix(self) -> ndarray:
         
+        self.transformation.update_trial()
+        
         # Get the transformation matrices
         Tbl = self.transformation.get_Tbl()
         
