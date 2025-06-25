@@ -56,11 +56,12 @@ class CorotationalTransformation2D(Transformation):
 
     def _get_corrotational_parameters(self):
         L0 = self.get_L0()
-        u_trial_global = np.vstack((self.node_i.u_trial, self.node_j.u_trial))
-        u_trial_local = self.get_Tlg() @ u_trial_global
         Delta_ul_x = u_trial_local[3, 0] - u_trial_local[0, 0]
         Delta_ul_y = u_trial_local[4, 0] - u_trial_local[1, 0]
-        beta = np.arctan2(Delta_ul_y, (L0 + Delta_ul_x))
+        Lx = L0 + Delta_ul_x
+        Ly = Delta_ul_y
+        Ln= np.sqrt(Lx**2 + Ly**2)
+        beta = np.arctan2(Delta_ul_y, Ln)
         return beta, Delta_ul_x, Delta_ul_y
 
     def get_cosine_director(self) -> tuple[float, float]:

@@ -68,8 +68,8 @@ class FrameElement(Element):
     
     def get_basic_stiffness_matrix(self) -> ndarray:
         EA, EI = self.section.get_stiffness_matrix()
-        L = self.transformation.get_length()
-        # L = self.transformation.get_L0()
+        # L = self.transformation.get_length()
+        L = self.transformation.get_L0()
 
         kb=np.array([
             [EA/L, 0, 0],

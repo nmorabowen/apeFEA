@@ -52,7 +52,7 @@ class PDeltaTransformation2D(Transformation):
         return np.linalg.norm(self.node_j.coords - self.node_i.coords)
 
     def get_length(self) -> float:
-        return np.linalg.norm(self._pos(self.node_j) - self._pos(self.node_i))
+        self.get_L0
 
     def _get_corrotational_parameters(self):
         L0 = self.get_L0()
@@ -94,12 +94,7 @@ class PDeltaTransformation2D(Transformation):
         
         return Tbl
 
-    def get_Tlg(self) -> ndarray:
-        
-        # beta, _, _ = self._get_corrotational_parameters()
-        # c = np.cos(beta)
-        # s = np.sin(beta)
-        
+    def get_Tlg(self) -> ndarray:        
         c, s, L = self.get_cosine_director()
         
         return np.array([
@@ -125,7 +120,6 @@ class PDeltaTransformation2D(Transformation):
         _, Delta_ul_x, Delta_ul_y = self._get_corrotational_parameters()
 
         self.ub_previous[:] = self.ub_trial
-        # self.ub_trial[0, 0] = L0*(Delta_ul_x/L0+(1/2)*(Delta_ul_y/L0)**2)
         self.ub_trial[0, 0] = Delta_ul_x + Delta_ul_y**2/(2*L0)
         self.ub_trial[1, 0] = self.node_i.u_trial[2, 0] - Delta_ul_y/L0
         self.ub_trial[2, 0] = self.node_j.u_trial[2, 0] - Delta_ul_y/L0
@@ -165,7 +159,13 @@ class PDeltaTransformation2D(Transformation):
             [0, 0, 0, 0, 0, 0]
         ])
         
-        
-        T_geo_Fb2 = np.zeros((6, 6))
+        T_geo_Fb2 = (1 / L0**2) * np.array([
+            [0, 0, 0, 0, 0, 0],
+            [0, 2, 1, 0, -2, -1],
+            [0, 1, 2, 0, -1, -2],
+            [0, 0, 0, 0, 0, 0],
+            [0, -2, -1, 0, 2, 1],
+            [0, -1, -2, 0, 1, 2],
+        ])
         
         return T_geo_Fb1, T_geo_Fb2
